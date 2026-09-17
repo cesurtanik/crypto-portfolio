@@ -26,24 +26,25 @@ function CoinDetail() {
         );
 
         setCoin(response.data);
+
         const chartResponse = await axios.get(
-  `https://api.coingecko.com/api/v3/coins/${id}/market_chart`,
-  {
-    params: {
-      vs_currency: "usd",
-      days: 7,
-    },
-  }
-);
+          `https://api.coingecko.com/api/v3/coins/${id}/market_chart`,
+          {
+            params: {
+              vs_currency: "usd",
+              days: 7,
+            },
+          }
+        );
 
-const formattedData = chartResponse.data.prices.map(
-  ([timestamp, price]) => ({
-    date: new Date(timestamp).toLocaleDateString("tr-TR"),
-    price: price,
-  })
-);
+        const formattedData = chartResponse.data.prices.map(
+          ([timestamp, price]) => ({
+            date: new Date(timestamp).toLocaleDateString("tr-TR"),
+            price: price,
+          })
+        );
 
-setChartData(formattedData);
+        setChartData(formattedData);
       } catch (error) {
         console.error("Coin detayları alınamadı:", error);
       } finally {
@@ -62,24 +63,18 @@ setChartData(formattedData);
     return <div className="loading">Coin bulunamadı.</div>;
   }
 
-  const price =
-    coin.market_data?.current_price?.usd;
+  const price = coin.market_data?.current_price?.usd;
 
-  const change =
-    coin.market_data?.price_change_percentage_24h;
+  const change = coin.market_data?.price_change_percentage_24h;
 
-  const marketCap =
-    coin.market_data?.market_cap?.usd;
+  const marketCap = coin.market_data?.market_cap?.usd;
 
-  const high24h =
-    coin.market_data?.high_24h?.usd;
+  const high24h = coin.market_data?.high_24h?.usd;
 
-  const low24h =
-    coin.market_data?.low_24h?.usd;
+  const low24h = coin.market_data?.low_24h?.usd;
 
   return (
     <div className="app">
-
       <button
         className="back-button"
         onClick={() => navigate("/")}
@@ -88,9 +83,7 @@ setChartData(formattedData);
       </button>
 
       <div className="detail-header">
-
         <div className="coin-detail-name">
-
           <img
             src={coin.image?.large}
             alt={coin.name}
@@ -99,29 +92,22 @@ setChartData(formattedData);
           <div>
             <h1>{coin.name}</h1>
 
-            <p>
-              {coin.symbol?.toUpperCase()}
-            </p>
+            <p>{coin.symbol?.toUpperCase()}</p>
           </div>
-
         </div>
 
         <div className="detail-price">
           ${price?.toLocaleString()}
         </div>
-
       </div>
 
       <div className="detail-stats">
-
         <div className="stat-card">
           <span>24 Saat Değişim</span>
 
           <strong
             className={
-              change >= 0
-                ? "positive"
-                : "negative"
+              change >= 0 ? "positive" : "negative"
             }
           >
             {change >= 0 ? "▲" : "▼"}{" "}
@@ -152,33 +138,36 @@ setChartData(formattedData);
             ${low24h?.toLocaleString()}
           </strong>
         </div>
-
       </div>
 
-     <div className="chart-card">
-  <h2>Son 7 Gün</h2>
+      <div className="chart-card">
+        <h2>Son 7 Gün</h2>
 
-  <ResponsiveContainer width="100%" height={400}>
-    <LineChart data={chartData}>
-      <XAxis dataKey="date" />
-      <YAxis />
-      <Tooltip
-        formatter={(value) => [
-          `$${Number(value).toLocaleString()}`,
-          "Fiyat",
-        ]}
-      />
+        <ResponsiveContainer
+          width="100%"
+          height={400}
+        >
+          <LineChart data={chartData}>
+            <XAxis dataKey="date" />
 
-      <Line
-        type="monotone"
-        dataKey="price"
-        strokeWidth={2}
-        dot={false}
-      />
-    </LineChart>
-  </ResponsiveContainer>
-</div>
+            <YAxis />
 
+            <Tooltip
+              formatter={(value) => [
+                `$${Number(value).toLocaleString()}`,
+                "Fiyat",
+              ]}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="price"
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/https://api.coingecko.com/api/v3/:path*",
-      "destination": "//api/https://api.coingecko.com/api/v3:path*"
+      "source": "/api/coingecko/:path*",
+      "destination": "https://api.coingecko.com/api/v3/:path*"
     },
     {
       "source": "/(.*)",
