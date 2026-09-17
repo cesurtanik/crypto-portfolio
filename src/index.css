@@ -318,8 +318,18 @@ body {
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: 15px;
+  height: 380px;
+  box-sizing: border-box;
 }
 
+.portfolio-chart h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.portfolio-chart .recharts-responsive-container {
+  height: 300px !important;
+}
 .portfolio-chart h2 {
   margin-top: 0;
   margin-bottom: 20px;

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 
 import CoinDetail from "./pages/CoinDetail";
 import Portfolio from "./pages/Portfolio";
@@ -12,6 +17,7 @@ function Dashboard() {
   const [coins, setCoins] = useState([]);
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   // Favorileri yükle
   useEffect(() => {
@@ -63,8 +69,7 @@ function Dashboard() {
           error
         );
 
-        // API çalışmazsa daha önce kaydedilmiş
-        // coin listesini kullan
+        // API çalışmazsa kayıtlı listeyi kullan
         const savedCoins =
           localStorage.getItem("availableCoins");
 
@@ -81,6 +86,7 @@ function Dashboard() {
               "Kayıtlı coinler okunamadı:",
               storageError
             );
+
             setCoins([]);
           }
         }
@@ -113,8 +119,16 @@ function Dashboard() {
     );
   };
 
-  // Arama
+  // Coinleri filtrele
   const filteredCoins = coins.filter((coin) => {
+    // Favoriler modu açıksa
+    if (
+      showFavorites &&
+      !favorites.includes(coin.id)
+    ) {
+      return false;
+    }
+
     const searchText =
       search.toLowerCase().trim();
 
@@ -137,6 +151,7 @@ function Dashboard() {
       <header className="header">
         <div>
           <h1>Crypto Portfolio</h1>
+
           <p>
             Kripto piyasasını takip et
           </p>
@@ -147,36 +162,36 @@ function Dashboard() {
           type="text"
           placeholder="Coin ara..."
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setShowFavorites(false);
+          }}
         />
       </header>
 
       <nav className="navbar">
+
+        {/* TÜM COİNLER */}
         <button
           onClick={() => {
             setSearch("");
+            setShowFavorites(false);
           }}
         >
           🏠 Tüm Coinler
         </button>
 
+        {/* FAVORİLER */}
         <button
           onClick={() => {
-            const favoriteCoins =
-              coins.filter((coin) =>
-                favorites.includes(coin.id)
-              );
-
-            if (favoriteCoins.length === 0) {
-              setSearch("__NO_FAVORITES__");
-            }
+            setSearch("");
+            setShowFavorites(true);
           }}
         >
           ⭐ Favoriler ({favorites.length})
         </button>
 
+        {/* PORTFÖY */}
         <button
           onClick={() =>
             navigate("/portfolio")
@@ -184,9 +199,12 @@ function Dashboard() {
         >
           💰 Portföyüm
         </button>
+
       </nav>
 
-      {search === "__NO_FAVORITES__" ? (
+      {/* FAVORİ YOKSA */}
+      {showFavorites &&
+      favorites.length === 0 ? (
         <div className="no-results">
           Henüz favori coin eklemediniz.
         </div>
@@ -196,7 +214,9 @@ function Dashboard() {
         </div>
       ) : (
         <div className="coin-grid">
+
           {filteredCoins.map((coin) => {
+
             const isFavorite =
               favorites.includes(coin.id);
 
@@ -205,12 +225,18 @@ function Dashboard() {
                 className="coin-card"
                 key={coin.id}
                 onClick={() =>
-                  navigate(`/coin/${coin.id}`)
+                  navigate(
+                    `/coin/${coin.id}`
+                  )
                 }
               >
+
                 <div className="coin-top">
+
                   <div>
-                    <h2>{coin.name}</h2>
+                    <h2>
+                      {coin.name}
+                    </h2>
 
                     <span>
                       {coin.symbol.toUpperCase()}
@@ -225,11 +251,17 @@ function Dashboard() {
                     }
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleFavorite(coin.id);
+
+                      toggleFavorite(
+                        coin.id
+                      );
                     }}
                   >
-                    {isFavorite ? "⭐" : "☆"}
+                    {isFavorite
+                      ? "⭐"
+                      : "☆"}
                   </button>
+
                 </div>
 
                 <div className="coin-price">
@@ -251,6 +283,7 @@ function Dashboard() {
                   0
                     ? "+"
                     : ""}
+
                   {Number(
                     coin.price_change_percentage_24h
                   ).toFixed(2)}
@@ -263,11 +296,14 @@ function Dashboard() {
                     coin.market_cap
                   ).toLocaleString()}
                 </div>
+
               </div>
             );
           })}
+
         </div>
       )}
+
     </div>
   );
 }
@@ -275,7 +311,9 @@ function Dashboard() {
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
+
         <Route
           path="/"
           element={<Dashboard />}
@@ -290,7 +328,9 @@ function App() {
           path="/portfolio"
           element={<Portfolio />}
         />
+
       </Routes>
+
     </BrowserRouter>
   );
 }

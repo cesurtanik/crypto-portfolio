@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+
 function Portfolio() {
   const [coins, setCoins] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
@@ -50,7 +51,11 @@ function Portfolio() {
 
         if (savedCoins) {
           try {
-            setCoins(JSON.parse(savedCoins));
+            const parsedCoins = JSON.parse(savedCoins);
+
+            if (Array.isArray(parsedCoins)) {
+              setCoins(parsedCoins);
+            }
           } catch {
             setCoins([]);
           }
@@ -70,8 +75,6 @@ function Portfolio() {
   }, []);
 
   // GÜNCEL FİYATLARI GETİR
-  // Bu fonksiyon useEffect'in DIŞINDA.
-  // Böylece buton da bu fonksiyonu kullanabilir.
   const fetchCurrentPrices = async () => {
     if (portfolio.length === 0) {
       setCurrentPrices({});
@@ -88,45 +91,111 @@ function Portfolio() {
       ].join(",");
 
       const response = await axios.get(
-        "https://api.coingecko.com/api/v3/simple/price",
+        "https://api.coingecko.com/api/v3/coins/markets",
         {
           params: {
+            vs_currency: "usd",
             ids: ids,
-            vs_currencies: "usd",
+            order: "market_cap_desc",
+            per_page: 100,
+            page: 1,
+            sparkline: false,
           },
         }
       );
 
-      setCurrentPrices(response.data);
+      const prices = {};
+
+      response.data.forEach((coin) => {
+        prices[coin.id] = {
+          usd: coin.current_price,
+        };
+      });
+
+      // Güncel fiyatları kaydet
+      localStorage.setItem(
+        "currentPrices",
+        JSON.stringify(prices)
+      );
+
+      setCurrentPrices(prices);
     } catch (error) {
       console.error(
         "Güncel fiyatlar alınamadı:",
         error
       );
+
+      // API çalışmazsa son başarılı fiyatları kullan
+      const savedPrices =
+        localStorage.getItem("currentPrices");
+
+      if (savedPrices) {
+        try {
+          const parsedPrices =
+            JSON.parse(savedPrices);
+
+          if (
+            parsedPrices &&
+            typeof parsedPrices === "object"
+          ) {
+            setCurrentPrices(parsedPrices);
+          }
+        } catch (storageError) {
+          console.error(
+            "Kayıtlı fiyatlar okunamadı:",
+            storageError
+          );
+        }
+      }
     } finally {
       setLoadingPrices(false);
     }
   };
 
- // Portföy değişince fiyatları getir
-useEffect(() => {
-  fetchCurrentPrices();
-}, [portfolio]);
+  // Sayfa açıldığında kayıtlı fiyatları yükle
+  useEffect(() => {
+    const savedPrices =
+      localStorage.getItem("currentPrices");
 
-// Her 60 saniyede bir fiyatları otomatik yenile
-useEffect(() => {
-  if (portfolio.length === 0) {
-    return;
-  }
+    if (savedPrices) {
+      try {
+        const parsedPrices =
+          JSON.parse(savedPrices);
 
-  const interval = setInterval(() => {
+        if (
+          parsedPrices &&
+          typeof parsedPrices === "object"
+        ) {
+          setCurrentPrices(parsedPrices);
+        }
+      } catch (error) {
+        console.error(
+          "Kayıtlı fiyatlar okunamadı:",
+          error
+        );
+      }
+    }
+  }, []);
+
+  // Portföy değişince fiyatları getir
+  useEffect(() => {
     fetchCurrentPrices();
-  }, 60000);
+  }, [portfolio]);
 
-  return () => {
-    clearInterval(interval);
-  };
-}, [portfolio]);;
+  // Her 60 saniyede bir fiyatları otomatik yenile
+  useEffect(() => {
+    if (portfolio.length === 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      fetchCurrentPrices();
+    }, 60000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [portfolio]);
 
   // Coin ekle
   const handleSubmit = (e) => {
@@ -266,18 +335,25 @@ useEffect(() => {
           totalInvested) *
         100
       : 0;
-const portfolioChartData = portfolio.map((item) => {
-  const currentPrice =
-    currentPrices[item.coin]?.usd || 0;
 
-  const currentValue =
-    Number(item.amount) * currentPrice;
+  // Portföy dağılımı
+  const portfolioChartData =
+    portfolio.map((item) => {
+      const currentPrice =
+        currentPrices[item.coin]?.usd || 0;
 
-  return {
-    name: item.name || item.coin.toUpperCase(),
-    value: currentValue,
-  };
-});
+      const currentValue =
+        Number(item.amount) *
+        currentPrice;
+
+      return {
+        name:
+          item.name ||
+          item.coin.toUpperCase(),
+        value: currentValue,
+      };
+    });
+
   return (
     <div className="app">
 
@@ -293,43 +369,58 @@ const portfolioChartData = portfolio.map((item) => {
           ? "Fiyatlar Güncelleniyor..."
           : "🔄 Fiyatları Yenile"}
       </button>
-{/* PORTFÖY DAĞILIMI */}
-{portfolio.length > 0 && (
-  <div className="portfolio-chart">
-    <h2>Portföy Dağılımı</h2>
 
-    <ResponsiveContainer width="100%" height={350}>
-      <PieChart>
-        <Pie
-          data={portfolioChartData}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          outerRadius={120}
-          label
-        >
-          {portfolioChartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} />
-          ))}
-        </Pie>
+      {/* PORTFÖY DAĞILIMI */}
+      {portfolio.length > 0 && (
+        <div className="portfolio-chart">
 
-        <Tooltip
-          formatter={(value) =>
-            `$${Number(value).toLocaleString(
-              undefined,
-              {
-                maximumFractionDigits: 2,
-              }
-            )}`
-          }
-        />
+          <h2>Portföy Dağılımı</h2>
 
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
-  </div>
-)}
+          <ResponsiveContainer
+            width="100%"
+            height={300}
+          >
+            <PieChart>
+
+              <Pie
+                data={portfolioChartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {portfolioChartData.map(
+                  (entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                    />
+                  )
+                )}
+              </Pie>
+
+              <Tooltip
+                formatter={(value) =>
+                  `$${Number(
+                    value
+                  ).toLocaleString(
+                    undefined,
+                    {
+                      maximumFractionDigits: 2,
+                    }
+                  )}`
+                }
+              />
+
+              <Legend />
+
+            </PieChart>
+          </ResponsiveContainer>
+
+        </div>
+      )}
+
       {/* PORTFÖY ÖZETİ */}
       <div className="portfolio-summary">
 
@@ -435,6 +526,7 @@ const portfolioChartData = portfolio.map((item) => {
                 {coin.symbol.toUpperCase()})
               </option>
             ))}
+
           </select>
 
           <label>Coin Miktarı</label>
@@ -604,7 +696,9 @@ const portfolioChartData = portfolio.map((item) => {
           )}
 
         </div>
+
       </div>
+
     </div>
   );
 }
