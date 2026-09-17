@@ -1,0 +1,326 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 30px 50px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.header h1 {
+  font-size: 30px;
+}
+
+.header p {
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.search {
+  width: 300px;
+  padding: 13px 18px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #1e293b;
+  color: white;
+  outline: none;
+  font-size: 15px;
+}
+
+.search::placeholder {
+  color: #94a3b8;
+}
+
+.coin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.coin-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 15px;
+  padding: 22px;
+  transition: 0.2s;
+}
+
+.coin-card:hover {
+  transform: translateY(-4px);
+}
+
+.coin-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.coin-top img {
+  width: 45px;
+  height: 45px;
+}
+
+.coin-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.coin-symbol {
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.coin-price {
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.coin-change {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.positive {
+  color: #22c55e;
+}
+
+.negative {
+  color: #ef4444;
+}
+
+.market-cap {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 100px;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 20px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .search {
+    width: 100%;
+  }
+}
+.navbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.navbar button {
+  padding: 10px 18px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #cbd5e1;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.navbar button:hover {
+  background: #334155;
+}
+
+.navbar button.active {
+  background: #334155;
+  color: white;
+}
+
+.coin-card {
+  position: relative;
+}
+
+.favorite {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.favorite-active {
+  color: #facc15;
+}
+
+.no-results {
+  color: #94a3b8;
+  font-size: 16px;
+}
+.portfolio-form {
+  margin-top: 30px;
+  max-width: 600px;
+  padding: 25px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 15px;
+}
+
+.portfolio-form h2 {
+  margin-bottom: 20px;
+}
+
+.portfolio-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.portfolio-form label {
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.portfolio-form select,
+.portfolio-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: #0f172a;
+  color: white;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.portfolio-form button {
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.portfolio-form button:hover {
+  opacity: 0.9;
+}
+.portfolio-list {
+  margin-top: 25px;
+}
+
+.portfolio-list h2 {
+  margin-bottom: 15px;
+}
+
+.portfolio-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  margin-bottom: 15px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+
+.portfolio-item strong {
+  font-size: 18px;
+}
+/* Portföy özeti */
+
+.portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-card span {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.summary-card strong {
+  font-size: 24px;
+}
+
+.summary-card small {
+  font-size: 14px;
+}
+
+.portfolio-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 18px;
+  margin-top: 14px;
+}
+
+.portfolio-item > button {
+  align-self: flex-end;
+  width: auto;
+  padding: 8px 18px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 800px) {
+  .portfolio-summary {
+    grid-template-columns: 1fr;
+  }
+}
+/* Portföy Dağılım Grafiği */
+.portfolio-chart {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 25px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 15px;
+}
+
+.portfolio-chart h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
